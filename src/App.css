@@ -1,6 +1,6 @@
 .App {
   height: 100vh;
-  background-color: #1a202c;
+  background-color: #670000;
   overflow: scroll;
   text-align: center;
 }
@@ -25,6 +25,7 @@
   font-size: 50px;
   font-weight: bold;
   color: white;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .sub-text {
@@ -52,6 +53,9 @@
   color: white;
 }
 
+.cta-button:hover {
+  border: solid 1px black;
+}
 .connect-wallet-button {
   background: -webkit-linear-gradient(left, #60c657, #35aee2);
   background-size: 200% 200%;
@@ -87,6 +91,10 @@
   font-weight: bold;
 }
 
+.footer-text:hover {
+  color: cyan;
+}
+
 .gif-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -111,6 +119,11 @@
   object-fit: cover;
 }
 
+.posted-by-text {
+  color: white;
+  font-weight: 700;
+}
+
 .connected-container input[type='text'] {
   display: inline-block;
   color: white;
@@ -127,4 +140,14 @@
 
 .connected-container button {
   height: 50px;
+}
+
+.landing-image-container {
+  position: relative;
+  bottom: 2.5rem;
+}
+
+.landing-image {
+  min-width: 20%;
+  height: 18rem;
 }
