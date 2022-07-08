@@ -152,3 +152,12 @@
   min-width: 20%;
   height: 18rem;
 }
+
+.btn-tip-sol {
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.btn-tip-sol:hover {
+  background-color: grey;
+}

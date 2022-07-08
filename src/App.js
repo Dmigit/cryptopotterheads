@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
-import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
+import { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL, Transaction, sendAndConfirmTransaction } from '@solana/web3.js';
 import { Program, Provider, web3 } from '@project-serum/anchor';
 import idl from './idl.json';
 import kp from './keypair.json'
@@ -76,15 +76,7 @@ const App = () => {
     }
   };
 
-  // const sendGif = async () => {
-  //   if (inputValue.length > 0) {
-  //     console.log('Gif link:', inputValue);
-  //     setGifList([...gifList, inputValue]);
-  //     setInputValue('');
-  //   } else {
-  //     console.log('Empty input. Please try again!')
-  //   }
-  // }
+
 
   const sendGif = async () => {
     if (inputValue.length === 0) {
@@ -144,6 +136,26 @@ const App = () => {
     }
   }
 
+  const tipSol = async (receiverAddress) => {
+    let transaction = new Transaction();
+    let connection = new Connection(clusterApiUrl('devnet'));
+
+    transaction.add(
+      SystemProgram.transfer({
+        fromPubkey: walletAddress.toBytes(), //maybe change to walletAddress.toBytes()
+        toPubkey: receiverAddress,
+        lamports: LAMPORTS_PER_SOL / 100
+      })
+    );
+
+    sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [walletAddress]
+    );
+
+  }
+
   //The following UI will be rendered when the user hasn't connected their wallet to the app yet
   const renderNotConnectedContainer = () => {
     return (
@@ -184,6 +196,12 @@ const App = () => {
               <div className="gif-item" key={index}>
                 <img src={item.gifLink} />
                 <p className="posted-by-text">Posted by: {item.userAddress.toString()}</p>
+                <button className="btn-tip-sol" onClick={(event) => {
+                  event.preventDefault();
+                  tipSol(item.userAddress)
+                }}>
+                  Send 0.01 SOL to GIF Poster💸
+                </button>
               </div>
             ))}
           </div>
