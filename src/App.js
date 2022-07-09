@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useMemo, useEffect, useState } from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
 import { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL, Transaction, sendAndConfirmTransaction } from '@solana/web3.js';
-import { Program, Provider, web3 } from '@project-serum/anchor';
+import  { Program, Provider, web3, useWallet, useAnchorWallet } from '@project-serum/anchor';
 import idl from './idl.json';
 import kp from './keypair.json'
 import './App.css';
+const anchor = require('@project-serum/anchor');
 
 //Reference to the Solana runtime
 const { SystemProgram, Keypair } = web3;
@@ -137,24 +138,40 @@ const App = () => {
   }
 
   const tipSol = async (receiverAddress) => {
-    let transaction = new Transaction();
-    let connection = new Connection(clusterApiUrl('devnet'));
+    try {
+      const provider = getProvider();
+      const program = new Program(idl, programID, provider);
 
-    transaction.add(
-      SystemProgram.transfer({
-        fromPubkey: walletAddress.toBytes(), //maybe change to walletAddress.toBytes()
-        toPubkey: receiverAddress,
-        lamports: LAMPORTS_PER_SOL / 100
-      })
-    );
-
-    sendAndConfirmTransaction(
-      connection,
-      transaction,
-      [walletAddress]
-    );
-
+      const lamportsToSend = LAMPORTS_PER_SOL / 100;
+      const amount = new anchor.BN(lamportsToSend);
+      await program.rpc.sendSol(amount, {
+      accounts: {
+        from: provider.wallet.publicKey,
+        to: receiverAddress,
+        systemProgram: SystemProgram.programId,
+      },
+     })
+     console.log('Successfully sent 0.01 SOL!')
+     window.alert(`You successfully tipped ${receiverAddress} 0.01 SOL!`)
+    } catch (error) {
+      console.error('Failed to send SOL:', error);
+      window.alert('Failed to send SOL:', error);
+    }
   }
+
+//   const tipSol = async (receiverAddress) => {
+//     const transaction = new Transaction()
+//     const lamportsToSend = LAMPORTS_PER_SOL / 100;
+//     transaction.add(
+//       SystemProgram.transfer({
+//         fromPubkey: walletAddress,
+//         toPubkey: receiverAddress,
+//         lamports: lamportsToSend,
+//       }),
+// )
+
+//     await wallet.sendTransaction(transaction, connection)
+//   }
 
   //The following UI will be rendered when the user hasn't connected their wallet to the app yet
   const renderNotConnectedContainer = () => {
@@ -198,7 +215,7 @@ const App = () => {
                 <p className="posted-by-text">Posted by: {item.userAddress.toString()}</p>
                 <button className="btn-tip-sol" onClick={(event) => {
                   event.preventDefault();
-                  tipSol(item.userAddress)
+                  tipSol(item.userAddress.toString())
                 }}>
                   Send 0.01 SOL to GIF Poster💸
                 </button>
